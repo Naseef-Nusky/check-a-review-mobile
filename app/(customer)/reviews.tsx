@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { FlatList, RefreshControl, Text, View } from 'react-native'
 import { useFocusEffect } from 'expo-router'
 import { customerApi, ApiError } from '../../src/services/api'
-import { ErrorText, Screen, Subtitle, Title } from '../../src/components/ui'
+import { ErrorText, Screen, Subtitle } from '../../src/components/ui'
 import { ReviewCard } from '../../src/components/ReviewCard'
 import { colors } from '../../src/constants'
 import { normalizeReviewsList, type ReviewLike } from '../../src/utils/reviewDisplay'
@@ -38,8 +38,7 @@ export default function MyReviewsScreen() {
         data={items}
         keyExtractor={(item, index) => String(item.id || index)}
         ListHeaderComponent={
-          <View style={{ marginBottom: 8, paddingTop: 4 }}>
-            <Title>My reviews</Title>
+          <View style={{ marginBottom: 8 }}>
             <Subtitle>Reviews you have submitted.</Subtitle>
             <ErrorText>{error}</ErrorText>
           </View>

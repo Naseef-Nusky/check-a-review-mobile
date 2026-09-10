@@ -3,7 +3,7 @@ import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { router, useFocusEffect } from 'expo-router'
 import { businessApi, ApiError } from '../../src/services/api'
-import { Button, Card, ErrorText, Screen, Stars, Subtitle, Title } from '../../src/components/ui'
+import { Button, Card, ErrorText, Screen, Subtitle } from '../../src/components/ui'
 import { BusinessLogo } from '../../src/components/BusinessLogo'
 import { colors } from '../../src/constants'
 import { getReviewReply, getReviewerName, normalizeReviewsList } from '../../src/utils/reviewDisplay'
@@ -122,9 +122,6 @@ export default function BusinessDashboardScreen() {
   const rating = Number(profile?.averageRating ?? profile?.average_rating ?? 0)
   const count = Number(profile?.reviewCount ?? profile?.review_count ?? 0)
   const logo = profile?.logo_url || profile?.logoUrl || profile?.logo
-  const detailLine = [profile?.category, profile?.website, profile?.email, profile?.phone]
-    .filter(Boolean)
-    .join(' · ')
 
   return (
     <Screen style={{ paddingBottom: 0 }}>
@@ -133,12 +130,25 @@ export default function BusinessDashboardScreen() {
         contentContainerStyle={{ paddingBottom: 36 }}
         showsVerticalScrollIndicator={false}
       >
-        <Title>Dashboard</Title>
-        <Subtitle>
-          {profile?.name
-            ? `Overview for ${profile.name}`
-            : 'Overview of your reputation and review activity.'}
-        </Subtitle>
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <BusinessLogo uri={logo} name={profile?.name} size={56} />
+            <Text
+              style={{ color: colors.text, fontWeight: '700', fontSize: 18, flex: 1 }}
+              numberOfLines={2}
+            >
+              {profile?.name || 'Your business'}
+            </Text>
+            <Pressable
+              onPress={() => router.push('/(business)/profile')}
+              hitSlop={8}
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            >
+              <Text style={{ color: colors.accent, fontWeight: '700' }}>Edit</Text>
+            </Pressable>
+          </View>
+        </Card>
+        <Subtitle>Overview of your reputation and review activity.</Subtitle>
         <ErrorText>{error}</ErrorText>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
@@ -150,13 +160,6 @@ export default function BusinessDashboardScreen() {
                   : 'Manage reviews'
               }
               onPress={() => router.push('/(business)/reviews')}
-            />
-          </View>
-          <View style={{ flexGrow: 1, minWidth: '46%' }}>
-            <Button
-              label="Edit company details"
-              variant="ghost"
-              onPress={() => router.push('/(business)/profile')}
             />
           </View>
           <View style={{ flexGrow: 1, minWidth: '46%' }}>
@@ -197,30 +200,6 @@ export default function BusinessDashboardScreen() {
             <Button label="Reply now" onPress={() => router.push('/(business)/reviews')} />
           </Card>
         ) : null}
-
-        <Card>
-          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
-            <BusinessLogo uri={logo} name={profile?.name} size={56} />
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>Company details</Text>
-                <Pressable onPress={() => router.push('/(business)/profile')}>
-                  <Text style={{ color: colors.accent, fontWeight: '600' }}>Edit →</Text>
-                </Pressable>
-              </View>
-              <Text style={{ color: colors.text, marginTop: 6, fontWeight: '600' }}>
-                {profile?.name || 'Your business'}
-              </Text>
-              <Text style={{ color: colors.muted, marginTop: 4, lineHeight: 20 }}>
-                {detailLine || 'Add your website, email, and phone on the profile page.'}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                <Stars rating={rating} />
-                <Text style={{ color: colors.muted }}>{count} reviews</Text>
-              </View>
-            </View>
-          </View>
-        </Card>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           <StatCard label="Average rating" value={loading ? '…' : rating.toFixed(1)} icon="star" />

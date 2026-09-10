@@ -21,7 +21,6 @@ import {
   PasswordField,
   Screen,
   Subtitle,
-  Title,
 } from '../../src/components/ui'
 import { ProfileAvatar } from '../../src/components/ProfileAvatar'
 import { colors } from '../../src/constants'
@@ -192,7 +191,6 @@ export default function CustomerProfileScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
         >
-          <Title>My Profile</Title>
           <Subtitle>Manage your personal information</Subtitle>
 
           <Card>

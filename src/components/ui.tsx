@@ -228,9 +228,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.page,
     paddingHorizontal: 16,
+    // Match spacing under the tab/stack nav header across all pages
+    paddingTop: 12,
   },
   titleWrap: {
-    marginTop: 4,
+    marginTop: 0,
     marginBottom: 8,
     paddingVertical: 4,
     justifyContent: 'center',
@@ -245,6 +247,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: colors.muted,
+    marginTop: 0,
     marginBottom: 16,
     lineHeight: 22,
   },

@@ -10,7 +10,7 @@ import {
 import { useFocusEffect } from 'expo-router'
 import { businessApi, ApiError } from '../../src/services/api'
 import { useAuth } from '../../src/context/AuthContext'
-import { Button, Card, ErrorText, Screen, Subtitle, Title } from '../../src/components/ui'
+import { Button, Card, ErrorText, Screen, Subtitle } from '../../src/components/ui'
 import { SquareCheckoutModal } from '../../src/components/SquareCheckoutModal'
 import { colors } from '../../src/constants'
 
@@ -267,7 +267,6 @@ export default function BusinessSubscriptionScreen() {
         contentContainerStyle={{ paddingBottom: 36 }}
         showsVerticalScrollIndicator={false}
       >
-        <Title>Subscription</Title>
         <Subtitle>Paid plans are priced and billed monthly in {primaryCurrency}.</Subtitle>
 
         <ErrorText>{error}</ErrorText>

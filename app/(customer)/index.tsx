@@ -129,8 +129,8 @@ export default function CustomerHomeScreen() {
 
   return (
     <Screen style={{ paddingBottom: 0 }}>
-      <View style={{ flexShrink: 0, paddingTop: 8 }}>
-        <View style={{ marginBottom: 10, paddingVertical: 6, justifyContent: 'center' }}>
+      <View style={{ flexShrink: 0 }}>
+        <View style={{ marginBottom: 10, paddingVertical: 2, justifyContent: 'center' }}>
           <Text
             style={{
               color: colors.text,

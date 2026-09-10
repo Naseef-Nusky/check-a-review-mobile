@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Alert, Pressable, Text, View } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { customerApi, ApiError } from '../../src/services/api'
-import { Button, ErrorText, Field, Screen, Subtitle, Title } from '../../src/components/ui'
+import { Button, ErrorText, Field, Screen, Subtitle } from '../../src/components/ui'
 import { colors } from '../../src/constants'
 
 export default function WriteReviewScreen() {
@@ -40,7 +40,6 @@ export default function WriteReviewScreen() {
 
   return (
     <Screen>
-      <Title>Write a review</Title>
       <Subtitle>Share your experience with this business.</Subtitle>
 
       <Text style={{ marginBottom: 8, fontWeight: '600', color: colors.text }}>Rating</Text>

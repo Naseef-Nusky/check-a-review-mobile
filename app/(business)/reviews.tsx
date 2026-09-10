@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { Alert, FlatList, RefreshControl, Text, View } from 'react-native'
 import { useFocusEffect } from 'expo-router'
 import { businessApi, ApiError } from '../../src/services/api'
-import { Button, ErrorText, Field, Screen, Subtitle, Title } from '../../src/components/ui'
+import { Button, ErrorText, Field, Screen, Subtitle } from '../../src/components/ui'
 import { ReviewCard } from '../../src/components/ReviewCard'
 import { colors } from '../../src/constants'
 import {
@@ -70,7 +70,6 @@ export default function BusinessReviewsScreen() {
 
   return (
     <Screen style={{ paddingBottom: 0 }}>
-      <Title>Reviews</Title>
       <Subtitle>Read and reply to customer reviews.</Subtitle>
       <ErrorText>{error}</ErrorText>
       <FlatList

@@ -12,7 +12,7 @@ import {
 import { router, useFocusEffect } from 'expo-router'
 import { useAuth } from '../../src/context/AuthContext'
 import { businessApi, ApiError } from '../../src/services/api'
-import { Button, Card, ErrorText, Field, Screen, Subtitle, Title } from '../../src/components/ui'
+import { Button, Card, ErrorText, Field, Screen, Subtitle } from '../../src/components/ui'
 import { LogoUploadField } from '../../src/components/LogoUploadField'
 import { SelectField } from '../../src/components/SelectField'
 import { colors, resolveMediaUrl } from '../../src/constants'
@@ -398,7 +398,6 @@ export default function BusinessProfileScreen() {
   if (loading) {
     return (
       <Screen>
-        <Title>Company profile</Title>
         <Subtitle>Loading company details…</Subtitle>
       </Screen>
     )
@@ -416,7 +415,6 @@ export default function BusinessProfileScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
         >
-          <Title>Company profile</Title>
           <Subtitle>
             All fields below are editable. Save anytime — changes appear on your public Check A Review
             page.
