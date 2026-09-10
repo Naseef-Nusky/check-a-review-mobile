@@ -173,6 +173,27 @@ export const customerApi = {
       message?: string
     }>(`/claims/businesses/${idOrSlug}/claim`, formData)
   },
+  getClaimAvailability: (idOrSlug: string | number) =>
+    api.get<{
+      claimed?: boolean
+      claimInProgress?: boolean
+      canSubmitClaim?: boolean
+      businessName?: string
+    }>(`/claims/businesses/${idOrSlug}/availability`),
+  /** Same endpoint as the public website claim verify page */
+  verifyBusinessClaimEmail: (tokenOrCode: string) =>
+    api.post<{
+      alreadyVerified?: boolean
+      businessName?: string
+      status?: string
+      emailVerified?: boolean
+      message?: string
+    }>('/claims/verify-email', { code: tokenOrCode, token: tokenOrCode }),
+  resendClaimVerification: (email: string, businessId?: string | number) =>
+    api.post<{ message?: string; businessName?: string }>('/claims/resend-verification', {
+      email,
+      ...(businessId != null ? { businessId: String(businessId) } : {}),
+    }),
 }
 
 export const businessApi = {

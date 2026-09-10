@@ -17,11 +17,11 @@ Logged in?
 
 ## Run
 
-1. Start backend on port **5001**
+1. Start backend on port **5000**
 2. Update `.env` with your Mac LAN IP (for a real phone):
 
 ```
-EXPO_PUBLIC_API_URL=http://YOUR_IP:5001/api
+EXPO_PUBLIC_API_URL=http://YOUR_IP:5000/api
 ```
 
 3. Start the app:

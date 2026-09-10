@@ -61,6 +61,14 @@ export default function RootLayout() {
             headerBackButtonDisplayMode: 'minimal',
           }}
         />
+        <Stack.Screen
+          name="claim/verify"
+          options={{
+            title: 'Verify claim email',
+            headerBackTitle: '',
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
       </Stack>
     </AuthProvider>
   )

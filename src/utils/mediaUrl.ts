@@ -1,7 +1,7 @@
 /** Resolve uploaded media (e.g. /uploads/logos/...) against the API host */
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:5001/api'
+  process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'
 
 export function resolveMediaUrl(path?: string | null): string {
   if (!path) return ''

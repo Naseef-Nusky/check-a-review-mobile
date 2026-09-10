@@ -2,7 +2,7 @@ export const APP_NAME = 'Check A Review'
 
 /** Backend API base. Override with EXPO_PUBLIC_API_URL in .env */
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:5001/api'
+  process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'
 
 export const USER_ROLES = {
   CUSTOMER: 'customer',

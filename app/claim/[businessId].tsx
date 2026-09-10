@@ -50,6 +50,7 @@ export default function ClaimBusinessScreen() {
   const { businessId } = useLocalSearchParams<{ businessId: string }>()
   const [businessName, setBusinessName] = useState('this business')
   const [alreadyClaimed, setAlreadyClaimed] = useState(false)
+  const [claimInProgress, setClaimInProgress] = useState(false)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -75,15 +76,23 @@ export default function ClaimBusinessScreen() {
     setLoading(true)
     setError(null)
     try {
-      const biz = (await customerApi.getBusiness(businessId)) as {
-        id?: string | number
-        name?: string
-        claimed?: boolean
-      }
-      setBusinessName(biz.name || 'this business')
-      if (biz.claimed) {
+      const [biz, availability] = await Promise.all([
+        customerApi.getBusiness(businessId) as Promise<{
+          id?: string | number
+          name?: string
+          claimed?: boolean
+        }>,
+        customerApi.getClaimAvailability(businessId).catch(() => null),
+      ])
+      setBusinessName(biz.name || availability?.businessName || 'this business')
+      if (biz.claimed || availability?.claimed) {
         setAlreadyClaimed(true)
         setError('This business profile has already been claimed.')
+      } else if (availability?.claimInProgress) {
+        setClaimInProgress(true)
+        setError(
+          'Only one claim request is allowed per business at a time. A request is already in progress.',
+        )
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Business not found')
@@ -133,7 +142,7 @@ export default function ClaimBusinessScreen() {
   }
 
   async function onSubmit() {
-    if (alreadyClaimed || !businessId) return
+    if (alreadyClaimed || claimInProgress || !businessId) return
     if (form.password !== form.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -194,13 +203,29 @@ export default function ClaimBusinessScreen() {
         </Text>
         <Title>Check your email</Title>
         <Subtitle>
-          Your claim for {businessName} is pending. We sent a verification link to your email.
-          After you verify, our team will review your request.
+          Your claim for {businessName} is pending. We sent a 6-digit verification code to{' '}
+          {form.email.trim() || 'your email'}. Enter that code in the app to continue.
         </Subtitle>
         <Text style={{ color: colors.muted, marginBottom: 20, fontSize: 13 }}>
-          Status: Pending · Email: Unverified until you click the link
+          Status: Pending · Email: Unverified until you enter the code
         </Text>
-        <Button label="Back to profile" onPress={() => router.back()} />
+        <Button
+          label="Enter verification code"
+          onPress={() =>
+            router.push({
+              pathname: '/claim/verify',
+              params: {
+                email: form.email.trim(),
+                businessId: String(businessId),
+              },
+            })
+          }
+        />
+        <Button
+          label="Back to profile"
+          variant="ghost"
+          onPress={() => router.back()}
+        />
       </Screen>
     )
   }
@@ -227,7 +252,7 @@ export default function ClaimBusinessScreen() {
 
           <ErrorText>{error}</ErrorText>
 
-          {!alreadyClaimed ? (
+          {!alreadyClaimed && !claimInProgress ? (
             <View style={{ gap: 4 }}>
               <Label>Full name</Label>
               <Field
