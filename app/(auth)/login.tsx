@@ -20,6 +20,7 @@ import {
   Title,
 } from '../../src/components/ui'
 import { colors } from '../../src/constants'
+import { AppleSignInButton, AuthOrDivider } from '../../src/components/AppleSignInButton'
 
 export default function LoginScreen() {
   const { login } = useAuth()
@@ -91,6 +92,17 @@ export default function LoginScreen() {
                 </View>
               ))}
             </View>
+
+            {role === 'customer' ? (
+              <>
+                <AppleSignInButton
+                  disabled={loading}
+                  onError={setError}
+                  onSuccess={() => router.replace('/(customer)')}
+                />
+                <AuthOrDivider />
+              </>
+            ) : null}
 
             <Field
               placeholder="Email"

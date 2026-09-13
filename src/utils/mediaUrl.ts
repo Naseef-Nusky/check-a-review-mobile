@@ -1,7 +1,6 @@
 /** Resolve uploaded media (e.g. /uploads/logos/...) against the API host */
 
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'
+import { getApiBaseUrl } from './apiBaseUrl'
 
 export function resolveMediaUrl(path?: string | null): string {
   if (!path) return ''
@@ -11,8 +10,9 @@ export function resolveMediaUrl(path?: string | null): string {
   }
   const normalized = value.startsWith('/') ? value : `/${value}`
   try {
-    if (/^https?:\/\//i.test(API_BASE_URL)) {
-      return `${new URL(API_BASE_URL).origin}${normalized}`
+    const apiBaseUrl = getApiBaseUrl()
+    if (/^https?:\/\//i.test(apiBaseUrl)) {
+      return `${new URL(apiBaseUrl).origin}${normalized}`
     }
   } catch {
     // fall through

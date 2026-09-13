@@ -20,6 +20,7 @@ import {
   Title,
 } from '../../src/components/ui'
 import { colors } from '../../src/constants'
+import { AppleSignInButton, AuthOrDivider } from '../../src/components/AppleSignInButton'
 import type { StoredUser } from '../../src/storage/authStorage'
 
 export default function RegisterScreen() {
@@ -113,6 +114,13 @@ export default function RegisterScreen() {
                 />
               </View>
             </View>
+
+            <AppleSignInButton
+              disabled={loading}
+              onError={setError}
+              onSuccess={() => router.replace('/(customer)')}
+            />
+            <AuthOrDivider />
 
             <Field
               placeholder="Full name"

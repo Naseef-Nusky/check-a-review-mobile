@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../constants'
+import { getApiBaseUrl } from '../utils/apiBaseUrl'
 import { clearAuth, getToken } from '../storage/authStorage'
 import { appendLogoToFormData, type LogoFile } from '../utils/logoUpload'
 
@@ -28,26 +28,59 @@ export type BusinessSearchItem = {
   logo?: string
 }
 
+function isFormDataBody(body: unknown): boolean {
+  if (!body || typeof body !== 'object') return false
+  if (typeof FormData !== 'undefined' && body instanceof FormData) return true
+  return typeof (body as FormData).append === 'function'
+}
+
 async function request<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = await getToken()
-  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
+  const method = String(options.method || 'GET').toUpperCase()
+  const isFormData = isFormDataBody(options.body)
+  const apiBaseUrl = getApiBaseUrl()
+  const url = `${apiBaseUrl}${endpoint}`
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  }
+  // iOS fetch can fail with "Network request failed" if JSON Content-Type is set on GET.
+  if (!isFormData && options.body != null && method !== 'GET' && method !== 'HEAD') {
+    headers['Content-Type'] = 'application/json'
+  }
+  if (token) headers.Authorization = `Bearer ${token}`
+  Object.assign(headers, (options.headers || {}) as Record<string, string>)
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  })
+  let response: Response
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+    })
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : 'Network request failed'
+    throw new ApiError(`Cannot reach the API at ${apiBaseUrl}. ${detail}`, 0)
+  }
 
-  const json = await response.json().catch(() => ({ message: 'Request failed' }))
+  const text = await response.text()
+  let json: { message?: string; data?: unknown; code?: string } = {}
+  if (text) {
+    try {
+      json = JSON.parse(text)
+    } catch {
+      throw new ApiError(
+        `Request failed (${response.status}). The API did not return JSON from ${url}`,
+        response.status,
+      )
+    }
+  } else if (!response.ok) {
+    throw new ApiError(`Request failed (${response.status}) from ${url}`, response.status)
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
       await clearAuth()
     }
-    throw new ApiError(json.message || 'Request failed', response.status, json.code || null)
+    throw new ApiError(json.message || `Request failed (${response.status})`, response.status, json.code || null)
   }
 
   if (response.status === 204) return null as T
@@ -74,6 +107,8 @@ export const authApi = {
       password,
       role,
     }),
+  loginWithApple: (data: { identityToken: string; email?: string | null; fullName?: string }) =>
+    api.post<{ token: string; user: Record<string, unknown> }>('/auth/apple', data),
   register: (data: {
     name: string
     email: string

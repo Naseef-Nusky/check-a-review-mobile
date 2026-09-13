@@ -15,9 +15,14 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.checkareview.mobile",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow Check A Review to access your photos so you can upload a business logo.",
-        "NSPhotoLibraryAddUsageDescription": "Allow Check A Review to save images when needed for your business profile."
+        "NSPhotoLibraryAddUsageDescription": "Allow Check A Review to save images when needed for your business profile.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        }
       }
     },
     "android": {
@@ -26,6 +31,7 @@
         "foregroundImage": "./assets/adaptive-icon.png"
       },
       "package": "com.checkareview.mobile",
+      "usesCleartextTraffic": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.READ_MEDIA_IMAGES",
@@ -39,6 +45,7 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
+      "expo-apple-authentication",
       [
         "expo-image-picker",
         {
