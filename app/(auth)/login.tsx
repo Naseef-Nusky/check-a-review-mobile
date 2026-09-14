@@ -21,6 +21,8 @@ import {
 } from '../../src/components/ui'
 import { colors } from '../../src/constants'
 import { AppleSignInButton, AuthOrDivider } from '../../src/components/AppleSignInButton'
+import { SupportContactLine } from '../../src/components/SupportContact'
+import { LegalAgreeLine } from '../../src/components/LegalLinks'
 
 export default function LoginScreen() {
   const { login } = useAuth()
@@ -146,6 +148,8 @@ export default function LoginScreen() {
             >
               Register your business
             </Link>
+            <LegalAgreeLine />
+            <SupportContactLine />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

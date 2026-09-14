@@ -21,6 +21,8 @@ import {
 } from '../../src/components/ui'
 import { colors } from '../../src/constants'
 import { AppleSignInButton, AuthOrDivider } from '../../src/components/AppleSignInButton'
+import { SupportContactLine } from '../../src/components/SupportContact'
+import { LegalAgreeLine } from '../../src/components/LegalLinks'
 import type { StoredUser } from '../../src/storage/authStorage'
 
 export default function RegisterScreen() {
@@ -166,6 +168,8 @@ export default function RegisterScreen() {
             >
               Already have an account? Sign in
             </Link>
+            <LegalAgreeLine />
+            <SupportContactLine />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

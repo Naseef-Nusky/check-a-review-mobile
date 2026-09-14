@@ -147,6 +147,7 @@ export const authApi = {
     return api.upload<Record<string, unknown>>('/auth/me/avatar', formData)
   },
   removeAvatar: () => api.delete<Record<string, unknown>>('/auth/me/avatar'),
+  deleteAccount: () => api.delete<{ message?: string }>('/auth/me'),
 }
 
 export const customerApi = {
@@ -176,6 +177,10 @@ export const customerApi = {
     content: string
   }) => api.post('/reviews', data),
   getMyReviews: () => api.get('/reviews/my'),
+  reportReview: (
+    reviewId: string | number,
+    data: { reason: string; details?: string; reporterName?: string; reporterEmail?: string },
+  ) => api.post(`/reviews/${reviewId}/report`, data),
   submitBusinessClaim: (
     idOrSlug: string | number,
     data: {
@@ -245,6 +250,10 @@ export const businessApi = {
     api.get(`/reviews/business/${businessId}?limit=50`),
   replyToReview: (reviewId: string | number, reply: string) =>
     api.post(`/reviews/${reviewId}/reply`, { reply }),
+  reportReview: (
+    reviewId: string | number,
+    data: { reason: string; details?: string; reporterName?: string; reporterEmail?: string },
+  ) => api.post(`/reviews/${reviewId}/report`, data),
   getAnalytics: (businessId: string | number) =>
     api.get(`/businesses/${businessId}/analytics`),
   getNotifications: () => api.get('/notifications'),
@@ -292,4 +301,6 @@ export const businessApi = {
     api.post<Record<string, unknown>>('/subscriptions/cancel', { businessId }),
   confirmCheckout: (businessId: string | number) =>
     api.post<Record<string, unknown>>('/subscriptions/confirm-checkout', { businessId }),
+  deleteBusiness: (businessId: string | number) =>
+    api.delete<{ id?: string | number; deleted?: boolean }>(`/businesses/${businessId}`),
 }

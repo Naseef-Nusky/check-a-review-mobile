@@ -100,7 +100,7 @@ async function ensureAndroidPhotoPermission(): Promise<string | null> {
   if (!permission.canAskAgain) {
     Alert.alert(
       'Photo access needed',
-      'Enable Photos permission in Settings to upload your business logo.',
+      'Enable Photos permission in Settings to set a profile picture or upload a business logo.',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Open Settings', onPress: () => Linking.openSettings() },
@@ -108,7 +108,7 @@ async function ensureAndroidPhotoPermission(): Promise<string | null> {
     )
   }
 
-  return 'Photos permission is required to upload a logo. Please allow access and try again.'
+  return 'Photos permission is required to upload an image. Please allow access and try again.'
 }
 
 export async function pickBusinessLogo(): Promise<{ file: LogoFile } | { error: string } | null> {

@@ -13,6 +13,7 @@ import { useAuth } from '../../src/context/AuthContext'
 import { Button, Card, ErrorText, Screen, Subtitle } from '../../src/components/ui'
 import { SquareCheckoutModal } from '../../src/components/SquareCheckoutModal'
 import { colors } from '../../src/constants'
+import { SupportContact } from '../../src/components/SupportContact'
 
 type PlanCatalogItem = {
   key: string
@@ -267,9 +268,21 @@ export default function BusinessSubscriptionScreen() {
         contentContainerStyle={{ paddingBottom: 36 }}
         showsVerticalScrollIndicator={false}
       >
-        <Subtitle>Paid plans are priced and billed monthly in {primaryCurrency}.</Subtitle>
+        <Subtitle>
+          Company plans only. Customers never pay. Billing is monthly B2B SaaS via Square — not an
+          Apple in-app purchase.
+        </Subtitle>
 
         <ErrorText>{error}</ErrorText>
+        <Card>
+          <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 6 }}>
+            Company billing
+          </Text>
+          <Text style={{ color: colors.muted, lineHeight: 20 }}>
+            These plans are for registered businesses only and are billed to the company via Square.
+            Consumer accounts are free. This is not an Apple in-app purchase.
+          </Text>
+        </Card>
         {message ? (
           <Card>
             <Text style={{ color: '#A7F3D0', lineHeight: 20 }}>{message}</Text>
@@ -485,6 +498,7 @@ export default function BusinessSubscriptionScreen() {
             ))
           )}
         </Card>
+        <SupportContact />
       </ScrollView>
 
       {checkout && businessId ? (

@@ -3,6 +3,7 @@ import { Pressable, Share, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { ProfileAvatar } from './ProfileAvatar'
 import { BusinessLogo } from './BusinessLogo'
+import { ReportReviewModal } from './ReportReviewModal'
 import { Stars } from './ui'
 import { colors } from '../constants'
 import {
@@ -56,6 +57,7 @@ type Props = {
   businessName?: string
   businessLogo?: string | null
   showActions?: boolean
+  showReport?: boolean
   footer?: React.ReactNode
 }
 
@@ -64,10 +66,12 @@ export function ReviewCard({
   businessName,
   businessLogo,
   showActions = true,
+  showReport = true,
   footer,
 }: Props) {
   const [helpfulCount, setHelpfulCount] = useState(Number(review.helpfulCount || review.helpful_count || 0))
   const [markedHelpful, setMarkedHelpful] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
 
   const author = getReviewerName(review)
   const avatar = getReviewerAvatar(review)
@@ -83,6 +87,9 @@ export function ReviewCard({
     () => `${title || 'Review'} — ${author}\n${content}`.trim(),
     [author, content, title],
   )
+
+  const reviewId = review.id
+  const canReport = showReport && reviewId != null && String(reviewId).length > 0
 
   async function onShare() {
     try {
@@ -155,6 +162,30 @@ export function ReviewCard({
             <Ionicons name="share-outline" size={16} color={colors.muted} />
             <Text style={styles.actionText}>Share</Text>
           </Pressable>
+
+          {canReport ? (
+            <Pressable
+              onPress={() => setReportOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Report this review"
+              style={({ pressed }) => [styles.actionBtn, styles.reportBtn, pressed && styles.reportBtnPressed]}
+            >
+              <Ionicons name="flag-outline" size={16} color={colors.danger} />
+              <Text style={[styles.actionText, { color: colors.danger }]}>Report</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : canReport ? (
+        <View style={styles.actions}>
+          <Pressable
+            onPress={() => setReportOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Report this review"
+            style={({ pressed }) => [styles.actionBtn, styles.reportBtn, pressed && styles.reportBtnPressed]}
+          >
+            <Ionicons name="flag-outline" size={16} color={colors.danger} />
+            <Text style={[styles.actionText, { color: colors.danger }]}>Report this review</Text>
+          </Pressable>
         </View>
       ) : null}
 
@@ -182,6 +213,14 @@ export function ReviewCard({
             <ExpandableText text={replyText} previewLines={5} color="#cbd5e1" />
           </View>
         </View>
+      ) : null}
+
+      {canReport ? (
+        <ReportReviewModal
+          reviewId={reviewId as string | number}
+          visible={reportOpen}
+          onClose={() => setReportOpen(false)}
+        />
       ) : null}
     </View>
   )
@@ -273,6 +312,13 @@ const styles = StyleSheet.create({
   actionCount: {
     color: colors.muted,
     fontSize: 12,
+  },
+  reportBtn: {
+    marginLeft: 'auto',
+    borderColor: 'rgba(248, 113, 113, 0.35)',
+  },
+  reportBtnPressed: {
+    backgroundColor: 'rgba(248, 113, 113, 0.12)',
   },
   replyBox: {
     marginTop: 14,

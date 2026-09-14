@@ -17,8 +17,8 @@
       "bundleIdentifier": "com.checkareview.mobile",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow Check A Review to access your photos so you can upload a business logo.",
-        "NSPhotoLibraryAddUsageDescription": "Allow Check A Review to save images when needed for your business profile.",
+        "NSPhotoLibraryUsageDescription": "Check A Review uses your photo library so you can set a profile picture and upload a business logo.",
+        "NSPhotoLibraryAddUsageDescription": "Check A Review may save a cropped image when you set a profile picture or business logo.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSAllowsLocalNetworking": true
@@ -38,6 +38,9 @@
         "android.permission.READ_EXTERNAL_STORAGE"
       ]
     },
+    "extra": {
+      "apiUrl": "https://api.checkareview.com/api"
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -49,10 +52,11 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Check A Review to access your photos so you can upload a business logo."
+          "photosPermission": "Check A Review uses your photo library so you can set a profile picture and upload a business logo."
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-web-browser"
     ]
   }
 }

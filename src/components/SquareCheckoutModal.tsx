@@ -413,6 +413,7 @@ export function SquareCheckoutModal({
             <Text style={{ color: colors.muted, marginTop: 4, fontSize: 13 }}>
               {planName}
               {priceLabel ? ` · ${priceLabel}` : ''}
+              {mode === 'update' ? '' : ' · Company billing via Square'}
             </Text>
           </View>
           <Pressable onPress={onClose} hitSlop={10} disabled={paying || openingApplePay}>

@@ -24,6 +24,7 @@ import {
 import { SelectField } from '../../src/components/SelectField'
 import { LogoUploadField } from '../../src/components/LogoUploadField'
 import { colors } from '../../src/constants'
+import { LegalAgreeLine } from '../../src/components/LegalLinks'
 import { BUSINESS_LOCATIONS } from '../../src/utils/locations'
 import { PHONE_COUNTRY_CODES } from '../../src/utils/phoneCountryCodes'
 import { stashPendingBusinessLogo } from '../../src/storage/pendingLogo'
@@ -702,6 +703,7 @@ Contact: ${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
             >
               Already have an account? Sign in
             </Link>
+            <LegalAgreeLine />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

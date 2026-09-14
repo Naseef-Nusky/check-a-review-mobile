@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,11 +12,12 @@ import {
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { useAuth } from '../../src/context/AuthContext'
-import { businessApi, ApiError } from '../../src/services/api'
+import { businessApi, authApi, ApiError } from '../../src/services/api'
 import { Button, Card, ErrorText, Field, Screen, Subtitle } from '../../src/components/ui'
 import { LogoUploadField } from '../../src/components/LogoUploadField'
 import { SelectField } from '../../src/components/SelectField'
 import { colors, resolveMediaUrl } from '../../src/constants'
+import { SupportContact } from '../../src/components/SupportContact'
 import { BUSINESS_LOCATIONS } from '../../src/utils/locations'
 import type { LogoFile } from '../../src/utils/logoUpload'
 
@@ -189,7 +191,7 @@ export default function BusinessProfileScreen() {
   const { width } = useWindowDimensions()
   const isNarrow = width < 400
   const isWide = width >= 700
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const [profile, setProfile] = useState<Record<string, unknown> | null>(null)
   const [categories, setCategories] = useState<CategoryMain[]>([])
   const [form, setForm] = useState({
@@ -216,6 +218,8 @@ export default function BusinessProfileScreen() {
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -394,6 +398,70 @@ export default function BusinessProfileScreen() {
     await logout()
     router.replace('/(auth)/login')
   }
+
+  async function performRemoveBusiness() {
+    const businessId = profile?.id
+    if (!businessId) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await businessApi.deleteBusiness(businessId as string | number)
+      await logout()
+      router.replace('/(auth)/login')
+    } catch (err) {
+      setDeleteError(err instanceof ApiError ? err.message : 'Failed to remove business')
+      setDeleting(false)
+    }
+  }
+
+  function onRemoveBusiness() {
+    const name = String(profile?.name || form.name || 'your business')
+    Alert.alert(
+      `Remove business "${name}"?`,
+      'This permanently deletes your business profile, reviews, subscription, and owner account. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove business permanently',
+          style: 'destructive',
+          onPress: performRemoveBusiness,
+        },
+      ],
+    )
+  }
+
+  async function performDeleteAccount() {
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await authApi.deleteAccount()
+      await logout()
+      router.replace('/(auth)/login')
+    } catch (err) {
+      setDeleteError(err instanceof ApiError ? err.message : 'Failed to delete account')
+      setDeleting(false)
+    }
+  }
+
+  function onDeleteAccount() {
+    Alert.alert(
+      'Delete your account permanently?',
+      'This removes your team login from Check A Review. The business profile stays online. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete my account',
+          style: 'destructive',
+          onPress: performDeleteAccount,
+        },
+      ],
+    )
+  }
+
+  const isOwner = Boolean(
+    profile?.is_owner ||
+      (profile?.user_id && user?.id && String(profile.user_id) === String(user.id)),
+  )
 
   if (loading) {
     return (
@@ -613,7 +681,48 @@ export default function BusinessProfileScreen() {
             </Text>
           </Card>
 
-          <Button label="Sign out" variant="danger" onPress={onLogout} />
+          <SupportContact />
+
+          {isOwner ? (
+            <Card>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.danger, marginBottom: 4 }}>
+                Remove business
+              </Text>
+              <Text style={{ color: colors.muted, marginBottom: 14, lineHeight: 20 }}>
+                Permanently delete {String(profile?.name || form.name || 'your business')}, including
+                published reviews, team access, domains, and your owner account. Any active Square
+                subscription will be cancelled first.
+              </Text>
+              <ErrorText>{deleteError}</ErrorText>
+              <Button
+                label={deleting ? 'Removing…' : 'Remove business permanently'}
+                variant="danger"
+                onPress={onRemoveBusiness}
+                loading={deleting}
+                disabled={saving || uploadingLogo || !profile?.id}
+              />
+            </Card>
+          ) : (
+            <Card>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 4 }}>
+                Delete account
+              </Text>
+              <Text style={{ color: colors.muted, marginBottom: 14, lineHeight: 20 }}>
+                Permanently remove your team login and personal data from Check A Review. This does
+                not delete the business profile.
+              </Text>
+              <ErrorText>{deleteError}</ErrorText>
+              <Button
+                label={deleting ? 'Deleting…' : 'Delete my account'}
+                variant="danger"
+                onPress={onDeleteAccount}
+                loading={deleting}
+                disabled={saving || uploadingLogo}
+              />
+            </Card>
+          )}
+
+          <Button label="Sign out" variant="ghost" onPress={onLogout} />
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>

@@ -24,6 +24,7 @@ import {
 } from '../../src/components/ui'
 import { ProfileAvatar } from '../../src/components/ProfileAvatar'
 import { colors } from '../../src/constants'
+import { SupportContact } from '../../src/components/SupportContact'
 import type { StoredUser } from '../../src/storage/authStorage'
 
 function Label({ children }: { children: string }) {
@@ -61,6 +62,7 @@ export default function CustomerProfileScreen() {
   const [changingPassword, setChangingPassword] = useState(false)
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null)
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useFocusEffect(
     useCallback(() => {
@@ -176,6 +178,34 @@ export default function CustomerProfileScreen() {
     router.replace('/(auth)/login')
   }
 
+  async function performDeleteAccount() {
+    setDeleting(true)
+    setError(null)
+    try {
+      await authApi.deleteAccount()
+      await logout()
+      router.replace('/(auth)/login')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to delete account')
+      setDeleting(false)
+    }
+  }
+
+  function onDeleteAccount() {
+    Alert.alert(
+      'Delete your account permanently?',
+      'This removes your profile and reviews from Check A Review. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete my profile',
+          style: 'destructive',
+          onPress: performDeleteAccount,
+        },
+      ],
+    )
+  }
+
   const displayName = name || user?.name || 'User'
   const avatarUrl = (user?.avatar_url as string) || (user?.avatarUrl as string) || ''
 
@@ -284,7 +314,26 @@ export default function CustomerProfileScreen() {
             />
           </Card>
 
-          <Button label="Sign out" variant="danger" onPress={onLogout} />
+          <SupportContact />
+
+          <Card>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 4 }}>
+              Delete user
+            </Text>
+            <Text style={{ color: colors.muted, marginBottom: 14, lineHeight: 20 }}>
+              Permanently remove your profile and personal data from Check A Review.
+            </Text>
+            <ErrorText>{error}</ErrorText>
+            <Button
+              label={deleting ? 'Deleting…' : 'Delete my profile'}
+              variant="danger"
+              onPress={onDeleteAccount}
+              loading={deleting}
+              disabled={saving || uploading || changingPassword}
+            />
+          </Card>
+
+          <Button label="Sign out" variant="ghost" onPress={onLogout} />
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>

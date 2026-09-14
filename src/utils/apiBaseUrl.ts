@@ -1,7 +1,7 @@
 import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 
-const DEFAULT_API_URL = 'http://localhost:5001/api'
+const PRODUCTION_API_URL = 'https://api.checkareview.com/api'
 
 function rewriteLegacyPort(url: string) {
   // macOS AirPlay owns 5000, so local API runs on 5001.
@@ -47,25 +47,39 @@ function expoLanHost(): string | null {
   )
 }
 
-export function resolveApiBaseUrl(raw = process.env.EXPO_PUBLIC_API_URL || DEFAULT_API_URL): string {
-  let url = String(raw || DEFAULT_API_URL).trim().replace(/\/+$/, '')
+function isLoopbackHost(hostname: string) {
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]' ||
+    hostname === '::1'
+  )
+}
 
-  // Dev-only: map localhost to the Mac LAN IP so a phone/simulator can reach the API.
-  // Production builds use EXPO_PUBLIC_API_URL as-is (e.g. https://checkareview.com/api).
+function configuredApiUrl() {
+  const extra = Constants.expoConfig?.extra as { apiUrl?: string } | undefined
+  return process.env.EXPO_PUBLIC_API_URL || extra?.apiUrl || PRODUCTION_API_URL
+}
+
+export function resolveApiBaseUrl(raw = configuredApiUrl()): string {
+  let url = String(raw || PRODUCTION_API_URL).trim().replace(/\/+$/, '')
+
   const isDev = typeof __DEV__ !== 'undefined' && __DEV__
-  if (!isDev) return url
+  if (!isDev) {
+    try {
+      if (isLoopbackHost(new URL(url).hostname)) return PRODUCTION_API_URL
+    } catch {
+      return PRODUCTION_API_URL
+    }
+    return url
+  }
 
   url = rewriteLegacyPort(url)
 
   if (Platform.OS !== 'web') {
     try {
       const parsed = new URL(url)
-      const isLoopback =
-        parsed.hostname === 'localhost' ||
-        parsed.hostname === '127.0.0.1' ||
-        parsed.hostname === '[::1]' ||
-        parsed.hostname === '::1'
-      if (isLoopback) {
+      if (isLoopbackHost(parsed.hostname)) {
         const lan = expoLanHost()
         if (lan) parsed.hostname = lan
         url = parsed.toString().replace(/\/+$/, '')
