@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native'
-import { Link, router } from 'expo-router'
+import { Link, router, useLocalSearchParams } from 'expo-router'
 import { useAuth } from '../../src/context/AuthContext'
 import { ApiError } from '../../src/services/api'
 import {
@@ -24,8 +24,15 @@ import { AppleSignInButton, AuthOrDivider } from '../../src/components/AppleSign
 import { SupportContactLine } from '../../src/components/SupportContact'
 import { LegalAgreeLine } from '../../src/components/LegalLinks'
 
+function safePostLoginPath(redirect: unknown, role: 'customer' | 'business') {
+  const path = String(Array.isArray(redirect) ? redirect[0] : redirect || '')
+  if (role === 'customer' && path.startsWith('/write-review/')) return path
+  return role === 'business' ? '/(business)' : '/(customer)'
+}
+
 export default function LoginScreen() {
   const { login } = useAuth()
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>()
   const { height: windowHeight } = useWindowDimensions()
   const [role, setRole] = useState<'customer' | 'business'>('customer')
   const [email, setEmail] = useState('')
@@ -35,12 +42,16 @@ export default function LoginScreen() {
 
   const compact = windowHeight < 720
 
+  function goAfterLogin(nextRole: 'customer' | 'business') {
+    router.replace(safePostLoginPath(redirect, nextRole))
+  }
+
   async function onSubmit() {
     setError(null)
     setLoading(true)
     try {
       const user = await login(email.trim(), password, role)
-      router.replace(user.role === 'business' ? '/(business)' : '/(customer)')
+      goAfterLogin(user.role)
     } catch (err) {
       if (err instanceof ApiError && err.code === 'EMAIL_NOT_VERIFIED') {
         router.push({
@@ -100,7 +111,7 @@ export default function LoginScreen() {
                 <AppleSignInButton
                   disabled={loading}
                   onError={setError}
-                  onSuccess={() => router.replace('/(customer)')}
+                  onSuccess={() => goAfterLogin('customer')}
                 />
                 <AuthOrDivider />
               </>

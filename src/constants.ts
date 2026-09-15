@@ -6,6 +6,8 @@ export const PUBLIC_SITE_URL = 'https://checkareview.com'
 export const PRIVACY_URL = `${PUBLIC_SITE_URL}/privacy`
 export const TERMS_URL = `${PUBLIC_SITE_URL}/terms`
 export const TERMS_BUSINESS_URL = `${PUBLIC_SITE_URL}/terms/business`
+export const REVIEW_TIPS_URL = `${PUBLIC_SITE_URL}/review-tips`
+export const TRUST_CENTRE_URL = `${PUBLIC_SITE_URL}/trust-centre`
 
 /** Paste into App Store Connect → App Review Information → Notes */
 export const APP_STORE_REVIEW_NOTES = `Check A Review is a review platform with two account types.

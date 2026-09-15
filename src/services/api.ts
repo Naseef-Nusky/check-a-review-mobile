@@ -173,9 +173,14 @@ export const customerApi = {
   createReview: (data: {
     businessId: string | number
     rating: number
-    title?: string
+    title: string
     content: string
+    inviteToken?: string
   }) => api.post('/reviews', data),
+  updateReview: (
+    reviewId: string | number,
+    data: { rating: number; title: string; content: string },
+  ) => api.put(`/reviews/${reviewId}`, data),
   getMyReviews: () => api.get('/reviews/my'),
   reportReview: (
     reviewId: string | number,
@@ -248,6 +253,8 @@ export const businessApi = {
   getCategories: () => api.get('/businesses/categories'),
   getReviews: (businessId: string | number) =>
     api.get(`/reviews/business/${businessId}?limit=50`),
+  getReviewSummary: (businessId: string | number) =>
+    api.get(`/businesses/${businessId}/review-summary`),
   replyToReview: (reviewId: string | number, reply: string) =>
     api.post(`/reviews/${reviewId}/reply`, { reply }),
   reportReview: (

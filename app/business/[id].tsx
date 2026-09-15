@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native'
+import { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, Text, View } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 import { customerApi, ApiError } from '../../src/services/api'
 import { Button, Card, ErrorText, Screen, Stars } from '../../src/components/ui'
 import { BusinessLogo } from '../../src/components/BusinessLogo'
 import { ReviewCard } from '../../src/components/ReviewCard'
+import { AiReviewSummaryCard, type AiReviewSummary } from '../../src/components/AiReviewSummaryCard'
 import { colors } from '../../src/constants'
 import { normalizeReviewsList, type ReviewLike } from '../../src/utils/reviewDisplay'
 
@@ -27,53 +28,21 @@ type Business = {
   verified_ownership?: boolean
 }
 
-type AiSummary = {
-  summary?: string
-  text?: string
-  content?: string
-  [key: string]: unknown
-}
-
-function ExpandableText({
-  text,
-  previewLines = 4,
-}: {
-  text: string
-  previewLines?: number
-}) {
-  const [expanded, setExpanded] = useState(false)
-  const needsToggle = text.length > 180 || text.split('\n').length > previewLines
-
-  return (
-    <View>
-      <Text
-        style={{ color: colors.muted, lineHeight: 22 }}
-        numberOfLines={expanded ? undefined : previewLines}
-      >
-        {text}
-      </Text>
-      {needsToggle ? (
-        <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={8} style={{ marginTop: 6 }}>
-          <Text style={{ color: colors.accent, fontWeight: '600' }}>
-            {expanded ? 'Show less' : 'Show more'}
-          </Text>
-        </Pressable>
-      ) : null}
-    </View>
-  )
-}
+type AiSummary = AiReviewSummary
 
 export default function BusinessDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [business, setBusiness] = useState<Business | null>(null)
   const [reviews, setReviews] = useState<ReviewLike[]>([])
   const [aiSummary, setAiSummary] = useState<AiSummary | null>(null)
+  const [aiSummaryLoading, setAiSummaryLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     if (!id) return
     setLoading(true)
+    setAiSummaryLoading(true)
     setError(null)
     try {
       const biz = (await customerApi.getBusiness(id)) as Business
@@ -87,6 +56,7 @@ export default function BusinessDetailScreen() {
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not load business')
     } finally {
+      setAiSummaryLoading(false)
       setLoading(false)
     }
   }, [id])
@@ -94,12 +64,6 @@ export default function BusinessDetailScreen() {
   useEffect(() => {
     load()
   }, [load])
-
-  const summaryText = useMemo(() => {
-    if (!aiSummary) return ''
-    if (typeof aiSummary === 'string') return aiSummary
-    return String(aiSummary.summary || aiSummary.text || aiSummary.content || '').trim()
-  }, [aiSummary])
 
   if (loading && !business) {
     return (
@@ -152,15 +116,6 @@ export default function BusinessDetailScreen() {
               </View>
             ) : null}
           </View>
-
-          {summaryText ? (
-            <Card>
-              <Text style={{ color: colors.accent, fontSize: 12, fontWeight: '700', marginBottom: 6 }}>
-                AI SUMMARY
-              </Text>
-              <ExpandableText text={summaryText} previewLines={5} />
-            </Card>
-          ) : null}
 
           <View style={{ gap: 10, marginBottom: 4 }}>
             <Button
@@ -215,6 +170,8 @@ export default function BusinessDetailScreen() {
           )}
         </View>
       ) : null}
+
+      <AiReviewSummaryCard summary={aiSummary} loading={aiSummaryLoading} />
 
       <Text style={{ fontWeight: '700', fontSize: 18, marginBottom: 10, color: colors.text }}>
         Reviews
