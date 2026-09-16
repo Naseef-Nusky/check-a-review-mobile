@@ -19,10 +19,7 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Check A Review uses your photo library so you can set a profile picture and upload a business logo.",
         "NSPhotoLibraryAddUsageDescription": "Check A Review may save a cropped image when you set a profile picture or business logo.",
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true,
-          "NSAllowsLocalNetworking": true
-        }
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -31,7 +28,6 @@
         "foregroundImage": "./assets/adaptive-icon.png"
       },
       "package": "com.checkareview.mobile",
-      "usesCleartextTraffic": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.READ_MEDIA_IMAGES",
@@ -39,7 +35,11 @@
       ]
     },
     "extra": {
-      "apiUrl": "https://api.checkareview.com/api"
+      "apiUrl": "https://api.checkareview.com/api",
+      "router": {},
+      "eas": {
+        "projectId": "250de55e-01e4-4c90-bddc-3dc2b8fe1583"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -57,6 +57,7 @@
       ],
       "expo-asset",
       "expo-web-browser"
-    ]
+    ],
+    "owner": "naseef-nusky"
   }
 }
